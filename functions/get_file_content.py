@@ -11,13 +11,15 @@ def get_file_content(working_directory, file_path):
     if not valid_target_file:
         return f'Error: Cannot list "{file_path}" as it is outside the permitted working directory'
 
-    if not os.path.isdir(target_file):
+    if os.path.isdir(target_file):
         return f'Error: File not found or is not a regular file: "{file_path}"'
     
     try:
-        file = io.FileIO(target_file)
-        file.read(MAX_CHARS)
+        file = io.open(target_file, mode="r", encoding="utf-8")
+        content = file.read(MAX_CHARS) 
         if file.read(1):
             content += f'[...File "{file_path}" truncated at {MAX_CHARS} characters]'
+
+        return content
     except:
         return f'Error: Thrown by standard library'
