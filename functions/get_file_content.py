@@ -1,4 +1,7 @@
 import os
+import io
+
+from config import MAX_CHARS
 
 def get_file_content(working_directory, file_path):
     abs = os.path.abspath(working_directory)
@@ -10,4 +13,11 @@ def get_file_content(working_directory, file_path):
 
     if not os.path.isdir(target_file):
         return f'Error: File not found or is not a regular file: "{file_path}"'
-    pass
+    
+    try:
+        file = io.FileIO(target_file)
+        file.read(MAX_CHARS)
+        if file.read(1):
+            content += f'[...File "{file_path}" truncated at {MAX_CHARS} characters]'
+    except:
+        return f'Error: Thrown by standard library'
