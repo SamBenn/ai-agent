@@ -13,7 +13,9 @@ def write_file(working_directory, file_path, content):
         return f'Error: Cannot write to "{file_path}" as it is a directory'
     
     try:
-        os.makedirs(target_file, exist_ok=True)
-        io.open()
+        os.makedirs(target_file[:target_file.rfind("/")], exist_ok=True)
+        file = io.open(target_file, mode="w")
+        file.write(content)
+        return f'Successfully wrote to "{file_path}" ({len(content)} characters written)'
     except:
         return "Error: Thrown by standard libraries"
