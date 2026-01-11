@@ -8,6 +8,8 @@ from google.genai import types
 from prompts import system_prompt
 from tools import *
 
+from functions.call_function import call_function
+
 load_dotenv()
 api_key = os.environ.get("GEMINI_API_KEY")
 client = genai.Client(api_key=api_key)
@@ -38,8 +40,19 @@ def main():
     
     print(response.text)
     if response.function_calls != None:
-        for function_call in response.function_calls:
-            print(f"Calling function: {function_call.name}({function_call.args})")
+        for func_call in response.function_calls:
+            func_call_result = call_function(func_call)
+            
+            if func_call_result.parts is None or func_call_result.parts == []:
+                raise Exception("Function result parts are None or Empty")
+
+            if func_call_result.parts[0].function_response.response is None:
+                raise Exception("Response is None")
+            
+            func_results = [func_call_result.parts[0]]
+
+            if args.verbose:
+                print(f"-> {func_call_result.parts[0].function_response.response}")
 
 if __name__ == "__main__":
     main()
