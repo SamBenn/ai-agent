@@ -6,6 +6,7 @@ from google import genai
 from google.genai import types
 
 from prompts import system_prompt
+from tools import *
 
 load_dotenv()
 api_key = os.environ.get("GEMINI_API_KEY")
@@ -18,22 +19,11 @@ args = parser.parse_args()
 def main():
     messages = [types.Content(role="user", parts=[types.Part(text=args.user_prompt)])]
 
-    schema_get_files_info = types.FunctionDeclaration(
-        name="get_files_info",
-        description="Lists files in a specified directory relative to the working directory, providing file size and directory status",
-        parameters=types.Schema(
-            type=types.Type.OBJECT,
-            properties={
-                "directory": types.Schema(
-                    type=types.Type.STRING,
-                    description="Directory path to list files from, relative to the working directory (default is the working directory itself)",
-                ),
-            },
-        ),
-    )
-
     available_functions = types.Tool(
-        function_declarations=[schema_get_files_info],
+        function_declarations=[schema_get_files_info,
+                               schema_get_file_content,
+                               schema_run_python_file,
+                               schema_write_file],
     )
 
     config = types.GenerateContentConfig(system_instruction=system_prompt, temperature=0, 
